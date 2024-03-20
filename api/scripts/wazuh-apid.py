@@ -71,7 +71,7 @@ def configure_ssl(params):
     uvicorn_params : dict
         uvicorn parameter configuration dictionary.
     """
-    from api.constants import  CONFIG_FILE_PATH
+    from api.constants import CONFIG_FILE_PATH
 
     try:
         # Generate SSL if it does not exist and HTTPS is enabled
@@ -149,7 +149,7 @@ def start(params: dict):
 
     If another Wazuh API is running, this function will fail because uvicorn server will
     not be able to create server processes in the same port.
-    The function creates the pool processes, the AsyncApp instance, setups the API spec.yaml, 
+    The function creates the pool processes, the AsyncApp instance, setups the API spec.yaml,
     the middleware classes, the error_handlers, the lifespan, and runs the uvicorn ASGI server.
 
     Parameters
@@ -218,10 +218,6 @@ def start(params: dict):
     app.add_error_handler(403, error_handler.problem_error_handler)
     app.add_error_handler(417, error_handler.expect_header_error_handler)
     
-    # Add application signals TO BE MODIFIED AFTER IMPLEMENTING CTI IN CONNEXION 3.0
-    # app.app.on_response_prepare.append(modify_response_headers)
-    # app.app.cleanup_ctx.append(register_background_tasks)
-
     # API configuration logging
     logger.debug(f'Loaded API configuration: {api_conf}')
     logger.debug(f'Loaded security API configuration: {security_conf}')
@@ -242,7 +238,7 @@ def start(params: dict):
 
 
 def print_version():
-    from wazuh.core.cluster import __version__, __author__, __wazuh_name__, __licence__
+    from wazuh.core.cluster import __author__, __licence__, __version__, __wazuh_name__
     print('\n{} {} - {}\n\n{}'.format(__wazuh_name__, __version__, __author__, __licence__))
 
 
@@ -310,7 +306,7 @@ if __name__ == '__main__':
                         action='store_true', dest='root')
     parser.add_argument('-c', help="Configuration file to use",
                         type=str, metavar='config', dest='config_file')
-    parser.add_argument('-d', help="Enable debug messages. Use twice to increase verbosity.", 
+    parser.add_argument('-d', help="Enable debug messages. Use twice to increase verbosity.",
                         action='count',
                         dest='debug_level')
     args = parser.parse_args()
@@ -328,33 +324,34 @@ if __name__ == '__main__':
     import logging
     import logging.config
     import ssl
-    import uvicorn
-
-    from connexion import AsyncApp
-    from connexion.options import SwaggerUIOptions
-    from connexion.exceptions import Unauthorized, HTTPException, ProblemException
-    from connexion.middleware import MiddlewarePosition
-
-    from starlette.middleware.cors import CORSMiddleware
-
-    from content_size_limit_asgi import ContentSizeLimitMiddleware
-    from content_size_limit_asgi.errors import ContentSizeExceeded
 
     import jwt
-
-    from api import error_handler, __path__ as api_path
-    from api.api_exception import APIError
-    from api.configuration import api_conf, security_conf, generate_private_key, \
-        generate_self_signed_certificate
-    from api.middlewares import SecureHeadersMiddleware, CheckRateLimitsMiddleware, \
-        CheckBlockedIP, WazuhAccessLoggerMiddleware, lifespan_handler
-    from api.util import to_relative_path
-    from api.uri_parser import APIUriParser
-    from api.constants import API_LOG_PATH
-    from api.alogging import set_logging
-
+    import uvicorn
+    from connexion import AsyncApp
+    from connexion.exceptions import HTTPException, ProblemException, Unauthorized
+    from connexion.middleware import MiddlewarePosition
+    from connexion.options import SwaggerUIOptions
+    from content_size_limit_asgi import ContentSizeLimitMiddleware
+    from content_size_limit_asgi.errors import ContentSizeExceeded
+    from starlette.middleware.cors import CORSMiddleware
+    from wazuh.core import common, pyDaemonModule, utils
     from wazuh.rbac.orm import check_database_integrity
-    from wazuh.core import pyDaemonModule, common, utils
+
+    from api import __path__ as api_path
+    from api import error_handler
+    from api.alogging import set_logging
+    from api.api_exception import APIError
+    from api.configuration import api_conf, generate_private_key, generate_self_signed_certificate, security_conf
+    from api.constants import API_LOG_PATH
+    from api.middlewares import (
+        CheckBlockedIP,
+        CheckRateLimitsMiddleware,
+        SecureHeadersMiddleware,
+        WazuhAccessLoggerMiddleware,
+    )
+    from api.signals import lifespan_handler
+    from api.uri_parser import APIUriParser
+    from api.util import to_relative_path
 
     try:
         if args.config_file is not None:
@@ -368,13 +365,14 @@ if __name__ == '__main__':
     uvicorn_params['host'] = api_conf['host']
     uvicorn_params['port'] = api_conf['port']
     uvicorn_params['loop'] = 'uvloop'
+    uvicorn_params['server_header'] = False
 
     # Set up logger file
     try:
         uvicorn_params['log_config'] = set_logging(log_filepath=API_LOG_PATH,
                                                    log_level=api_conf['logs']['level'].upper(),
                                                    foreground_mode=args.foreground)
-    except APIError as e:
+    except APIError:
         print(f"Configuration error in the API log format: {api_conf['logs']['format']}.")
         sys.exit(1)
 
