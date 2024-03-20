@@ -3,9 +3,12 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Tag name of the Docker image to be uploaded (Use developer to set branch name. Use auto to set src/VERSION content)'
-        required: false
-        default: auto
+        description: |
+          Tag name of the Docker image to be uploaded.
+          Use 'developer' to set branch name as tag.
+          Use 'auto' to set branch version as tag.
+          Default is 'auto'.
+
 jobs:
   Upload-WPK-images:
     runs-on: ubuntu-latest
