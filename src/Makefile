@@ -133,6 +133,10 @@ endif
 
 ifeq (${uname_S},Darwin)
 SYSINFO_OS=-DCMAKE_SYSTEM_NAME=Darwin
+EXECUTABLE_FILES=$(shell find . -maxdepth 1 -type f -exec /bin/sh -c "file {} | grep 'bit executable' > /dev/null" \; -print)
+EXECUTABLE_FILES+=$(shell find . -type f -not -path "./external/*" -not -path "./symbols/*" -name  "*.dylib" -print)
+	@echo
+	${EXECUTABLE_FILES}
 endif
 
 ifneq (,$(filter ${TEST},YES yes y Y 1))
