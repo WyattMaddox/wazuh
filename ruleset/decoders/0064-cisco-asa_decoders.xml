@@ -178,7 +178,7 @@
   <parent>cisco-asa</parent>
   <prematch offset="after_parent">1-106021|1-106022|4-4000</prematch>
   <regex offset="after_parent">(\w+): \.+ from (\S+)</regex>
-  <order>id, srcip</order>
+  <order>id, src_ip</order>
 </decoder>
 
 <!--
@@ -188,7 +188,7 @@
   <parent>cisco-asa</parent>
   <prematch offset="after_parent">^4-401004</prematch>
   <regex offset="after_parent">(\S+) Shunned packet: (\S+) = (\S+) </regex>
-  <order>id, srcip, dstip</order>
+  <order>id, src_ip, dst_ip</order>
 </decoder>
 
 <!--
@@ -219,7 +219,7 @@
   <prematch offset="after_parent">3-710003|7-710002|7-710005</prematch>
   <regex offset="after_parent">(\w+): (\S+) \w+ (\.+) from </regex>
   <regex>(\S+)/(\S+) to \w+:(\S+)/(\S+)</regex>
-  <order>id, protocol, action, srcip, srcport, dstip, dstport</order>
+  <order>id, protocol, action, src_ip, src_port, dst_ip, dst_port</order>
 </decoder>
 
 <!--
@@ -230,7 +230,7 @@
   <prematch offset="after_parent">4-106023</prematch>
   <regex offset="after_parent">(\S+): (\w+) (\w+) src \w+:</regex>
   <regex>(\S+)/(\S+) dst \w+:(\S+)/(\S+)</regex>
-  <order>id, action, protocol, srcip, srcport, dstip, dstport</order>
+  <order>id, action, protocol, src_ip, src_port, dst_ip, dst_port</order>
 </decoder>
 
 <!--
@@ -240,7 +240,7 @@
   <parent>cisco-asa</parent>
   <prematch offset="after_parent">6-106015</prematch>
   <regex offset="after_parent">(\w+): (\w+) (\w+) \.+ from (\S+)/(\S+) to (\S+)/(\S+) flags (\S+)\s+on interface (\S+)</regex>
-  <order>id, action, protocol, srcip, srcport, dstip, dstport, flags, interface</order>
+  <order>id, action, protocol, src_ip, src_port, dst_ip, dst_port, flags, interface</order>
 </decoder>
 
 <!--
@@ -252,7 +252,7 @@
   <regex offset="after_parent">(\w+): (\S+) Accessed URL </regex>
   <regex>(\S+):(http\w*://\.+)|</regex>
   <regex>^(\S+): (\S+) Accessed URL (\S+):</regex>
-  <order>id, srcip, dstip, url</order>
+  <order>id, src_ip, dst_ip, url</order>
 </decoder>
 
 <!--
@@ -263,28 +263,28 @@
   <prematch offset="after_parent">5-304002</prematch>
   <regex offset="after_parent">^(\S+): Access (denied) URL (http\w*://\.+) </regex>
   <regex>SRC (\S+) DEST (\S+) on interface</regex>
-  <order>id, action, url, srcip, dstip</order>
+  <order>id, action, url, src_ip, dst_ip</order>
 </decoder>
 
 <!--
 %ASA-6-308001: console enable password incorrect for number tries (from 192.168.0.1)
 -->
-<decoder name="cisco-asa-srcip">
+<decoder name="cisco-asa-src_ip">
   <parent>cisco-asa</parent>
   <prematch offset="after_parent">6-308001</prematch>
   <regex offset="after_parent">(\w+): \.+ \pfrom (\d+.\d+.\d+.\d+)</regex>
-  <order>id, srcip</order>
+  <order>id, src_ip</order>
 </decoder>
 
 <!--
 %ASA-6-605004: Login denied from 192.168.2.10/32597 to outside:192.168.2.14/ssh for user "root"
 %ASA-6-605005: Login permitted from 192.168.0.1/11 to outside:192.168.0.2/ssh for user "username"
 -->
-<decoder name="cisco-asa-srcip-port">
+<decoder name="cisco-asa-src_ip-port">
   <parent>cisco-asa</parent>
   <prematch offset="after_parent">6-605004|6-605005</prematch>
   <regex offset="after_parent">(\w+): Login (\S+) from (\S+)/(\S+) to (\S+):(\S+)/(\S+) for user "(\w+)"</regex>
-  <order>id, action, srcip, srcport, interface, dstip, dstport, user</order>
+  <order>id, action, src_ip, src_port, interface, dst_ip, dst_port, user</order>
 </decoder>
 
 <!--
